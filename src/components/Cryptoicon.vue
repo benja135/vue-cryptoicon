@@ -1,5 +1,5 @@
 <template>
-  <svg
+  <svg v-if="svg"
     :width="size"
     :height="size"
     :class="`cryptoicon--${symbol}`"
@@ -7,6 +7,7 @@
     viewBox="0 0 32 32"
     @click="$emit('click')"
     v-html="icon" />
+  <img v-else :src="backup" :width="size" :height="size">
 </template>
 
 <script>
@@ -25,6 +26,10 @@ export default {
       type: [String, Number],
       default: '24'
     },
+    backup: {
+      type: [String],
+      default: null
+    },
     generic: {
       type: Boolean,
       default: false
@@ -32,7 +37,8 @@ export default {
   },
   data() {
     return {
-      lookupSymbol: new Map([['BCHSV', 'BSV'], ['BCHABC', 'BAB']])
+      lookupSymbol: new Map([['BCHSV', 'BSV'], ['BCHABC', 'BAB']]),
+      svg: true
     };
   },
   computed: {
@@ -49,6 +55,8 @@ export default {
       let icon = this.$options.lib.find(i => i.symbol === symbol.toLowerCase());
       if (icon) {
         return !this.color ? icon.colorIcon() : icon.plainIcon(this.color);
+      } else if (this.backup) {
+        this.svg = false;
       } else if (this.generic) {
         let icon = this.$options.lib.find(i => i.symbol == 'generic');
         if (icon) {
